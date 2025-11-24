@@ -1,0 +1,317 @@
+@font-face {
+    font-family: 'Raleway';
+    src: local("Raleway-Bold"), local("Raleway-Bold"), /**/
+        url("Raleway-Bold.ttf");
+}
+
+@font-face {
+    font-family: 'RalewayBold';
+    src: local("rawline-bold"), local("rawline-bold"),
+        url("rawline-bold.ttf");
+}
+
+/* ---------------------------------------------------- */
+/* Modo Oscuro por defecto (Seteando variables en :root) */
+/* ---------------------------------------------------- */
+:root {
+    --body-bg: #1e1e1e;     /* DEFAULT DARK MODE */
+    --body-text: #f8f9fa;   /* DEFAULT DARK MODE */
+    --card-bg: #2d2d30;     /* DEFAULT DARK MODE */
+    --border-color: #444;   /* DEFAULT DARK MODE */
+    --header-bg: #000000;
+    --header-text: #ffffff;
+    
+    --accent-color: #FF7A00;       /* Naranja por defecto */
+    --label-text-color: white;     /* Blanco por defecto para el rótulo */
+}
+
+/* Modo Claro (Override si se quita la clase dark-mode) */
+body.light-mode { 
+    --body-bg: #f8f9fa;
+    --body-text: #212529;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --header-bg: #343a40; 
+    --header-text: #ffffff;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--body-bg); 
+    color: var(--body-text);         
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ---------------------------------------------------- */
+/* Escala de Interfaz (Abarcativa) */
+/* ---------------------------------------------------- */
+
+.form-group {
+    margin-bottom: 1.5rem !important; /* Más espacio entre grupos */
+}
+
+.form-group label, .form-check-label {
+    font-size: 1.15rem; /* Aumentar tamaño de etiquetas */
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block; 
+    color: var(--body-text);
+}
+
+.form-control, #downloadFormat {
+    font-size: 1.1rem !important; /* Aumentar tamaño de texto en inputs/select */
+    padding: 0.75rem 1rem !important; /* Aumentar padding para inputs más grandes */
+    height: auto !important; 
+    background-color: var(--card-bg) !important; 
+    color: var(--body-text) !important;
+    border-color: var(--border-color) !important;
+}
+
+.form-check-input {
+    transform: scale(1.4); /* Checkbox más grande */
+    margin-top: 0.5rem;
+}
+
+#imageForm .btn {
+    font-size: 1.2rem;
+    padding: 0.8rem 1.8rem; /* Botones más grandes */
+    margin-top: 1.5rem;
+    width: 100%; /* Botones a ancho completo */
+}
+
+/* ---------------------------------------------------- */
+/* Header */
+/* ---------------------------------------------------- */
+
+.app-header {
+    background-color: var(--header-bg) !important;
+    color: var(--header-text) !important;
+    border-bottom: 3px solid var(--accent-color); 
+}
+
+.app-header h2 {
+    color: var(--header-text) !important;
+    font-weight: 800;
+}
+
+.app-header .mb-0 {
+    font-size: 1.05rem; /* Fecha y hora */
+}
+
+/* NUEVO: Estilos para el Header */
+.app-header {
+    background-color: var(--header-bg) !important;
+    color: var(--header-text) !important;
+    border-bottom: 3px solid var(--accent-color); /* Usar accent color de la imagen */
+}
+
+.app-header h2 {
+    color: var(--header-text) !important;
+    font-weight: 800;
+}
+
+/* NUEVO: Asegurar que los elementos del formulario usen las variables en Modo Oscuro */
+.container, .form-group label, .form-check-label {
+    color: var(--body-text);
+}
+
+.form-control {
+    background-color: var(--card-bg) !important;
+    color: var(--body-text) !important;
+    border-color: var(--border-color) !important;
+}
+
+.form-control-file {
+    color: var(--body-text) !important;
+}
+
+#imagen3 {
+    width: 900px !important;
+    height: 1125px !important;
+    /* background-color: #f5883d !important; <--- Línea eliminada en el paso anterior */
+    box-sizing: border-box !important;
+    position: relative !important;
+   /* background-size: cover !important;
+    background-position: center center;*/
+    display: block;
+
+    /* Variables de color dinámicas */
+    --accent-color: #FF7A00;       /* Naranja por defecto */
+    --label-text-color: white;     /* Blanco por defecto para el rótulo */
+}
+
+.fondoNegro2 {
+    width: 100% !important;
+    height: auto !important;
+    position: absolute !important;
+    bottom: 70px !important;
+    z-index: 999;
+}
+
+.fondoContainer3 {
+    height: 100% !important;
+    width: 800px !important;
+    margin-left: 40px !important;
+    margin-right: 0px !important;
+    margin-bottom: 40px !important;
+    position: relative !important;
+    z-index: 90 !important;
+    margin-bottom: 30px !important;
+}
+
+.gradient3 {
+    position: absolute !important;
+    z-index: 1 !important;
+    margin-bottom: -40px !important;
+    margin-left: -40px !important;
+    width: 900px !important;
+    height: 1125px !important;
+    bottom: 0 !important;
+
+     pointer-events: none;
+}
+
+.data3Margin {
+    width: auto;
+    padding-left: 23px !important;
+}
+
+.margin2{
+    margin-right: 23px !important;
+}
+
+#rectNar2img2 {
+    display: table;
+    width: auto;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Raleway';
+    font-weight: 900;
+    color: var(--label-text-color); /* Color de texto adaptativo */
+    padding: 2px;
+    padding-left: 11px;
+    padding-right: 11px;
+    margin-bottom: 15px;
+    margin-left: 50px;
+    background-color: var(--accent-color) !important; /* Color de fondo dinámico */
+    margin-top: 5px !important;
+    position: relative;
+    z-index: 99 !important;
+    border-radius: 5px !important;
+    font-size: 37px !important;
+}
+
+#imagen3 h1 {
+    font-family: 'Raleway', sans-serif !important;
+    font-weight: 800 !important;
+    color: white !important;
+    line-height: 46px !important;
+    margin-top: 4px !important;
+    font-size: 44px !important;
+    margin-bottom: 5px !important;
+}
+
+#titulo3 {
+    position: relative !important;
+    z-index: 2 !important;
+    text-transform: uppercase !important;
+}
+
+.footer {
+    background-color: white !important;
+    width: 100% !important;
+    height: 70px !important;
+    position: absolute !important;
+    bottom: 0 !important;
+}
+
+.footer img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0px !important;
+    width: 900px !important;
+}
+
+.data3 {
+    margin-left: 13px;
+    margin-bottom: 40px;
+}
+
+.data3::after {
+    content: "";
+    width: 7px;
+    height: 100%;
+    border-radius: 80px;
+    background-color: var(--accent-color); /* Color de acento dinámico */
+    position: absolute;
+    left: 10px;
+    top: 0;
+    z-index: 1 !important;
+}
+
+#imagen3{
+  width:1080px;
+  height:1350px;
+  position:relative;
+  overflow:hidden;                 /* recorta cualquier desborde */
+  background-size: cover;          /* cubre todo el canvas */
+  background-position: center;     /* centrado */
+  background-repeat: no-repeat;    /* sin repetir */
+  background-color:#fff;           /* color de fondo si usás JPG */
+}
+.footer{ position:absolute; left:0; right:0; bottom:0; }
+.footer img{ width:100%; height:auto; display:block; }
+
+/* Capas para el modo FIT (imagen completa con blur de fondo) */
+#imagen3 {
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-blur {
+  position: absolute !important;
+  inset: 0 !important;
+  /* No usamos imagen ni blur; se setea via JS un color/gradiente */
+  background: #222;        /* fallback */
+  z-index: 0;
+}
+
+/* Imagen de frente en modo FIT */
+#fgPhoto {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;                 /* se coloca arriba por defecto */
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: auto;
+  cursor: grab;
+  z-index: 1;             /* encima del blur, debajo de tus overlays si estos tienen z-index alto */
+}
+
+/* Feedback durante arrastre */
+#fgPhoto.dragging,
+#imagen3.dragging {
+  cursor: grabbing;
+}
+
+/* Subtítulo naranja */
+/* Subtítulo */
+#tituloSub {
+  font-family: 'Raleway', sans-serif !important;
+  font-weight: 800 !important;
+  color: var(--accent-color) !important; /* Color de acento dinámico */
+  font-size: 34px !important;
+  line-height: 34px !important;
+  margin: 6px 0 0 0 !important;
+  text-transform: none !important;
+  z-index: 3 !important;
+  position: relative !important;
+}
+
+/* Clase para el texto de color naranja dentro del título */
+.orange-text {
+  color: var(--accent-color) !important; /* Color de acento dinámico */
+}
