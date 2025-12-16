@@ -191,23 +191,26 @@ body {
     padding: 2px;
     padding-left: 11px;
     padding-right: 11px;
-    margin-bottom: 15px;
-    margin-left: 50px;
+    margin-bottom: 16px;
+    margin-left: 71px;
     background-color: var(--accent-color) !important; /* Color de fondo dinámico */
     margin-top: 5px !important;
     position: relative;
     z-index: 99 !important;
-    border-radius: 5px !important;
-    font-size: 37px !important;
+    /* border-radius: 5px !important; */
+    font-size: 36px !important;
 }
 
 #imagen3 h1 {
     font-family: 'Raleway', sans-serif !important;
     font-weight: 800 !important;
     color: white !important;
-    line-height: 46px !important;
+    line-height: 41px !important;
     margin-top: 4px !important;
-    font-size: 44px !important;
+    /*margin-top: 4px !important;*/
+    /*letter-spacing: 0.0001px; */
+    letter-spacing: -0.36px;
+    font-size: 42px !important;
     margin-bottom: 5px !important;
 }
 
@@ -234,8 +237,9 @@ body {
 }
 
 .data3 {
-    margin-left: 13px;
-    margin-bottom: 40px;
+    margin-left: 25px; /******ACA*/
+    /*margin-bottom: 40px;*/
+    margin-bottom: 5px;
 }
 
 .data3::after {
@@ -245,7 +249,7 @@ body {
     border-radius: 80px;
     background-color: var(--accent-color); /* Color de acento dinámico */
     position: absolute;
-    left: 10px;
+    left: 24px; /******ACA*/
     top: 0;
     z-index: 1 !important;
 }
@@ -315,3 +319,16 @@ body {
 .orange-text {
   color: var(--accent-color) !important; /* Color de acento dinámico */
 }
+
+/* ---------------------------------------------------- */
+/* NUEVO: Contenedor para subtítulo separado */
+/* ---------------------------------------------------- */
+.subtitulo-separado {
+    /* Aplicar la misma alineación horizontal que tiene el título */
+    width: auto;
+    /* Los 43px de .data3 + los 23px de .data3Margin */
+    padding-left: 23px !important; /* Mantenemos el padding de data3Margin */
+    margin-top: -30px; /* Ajuste manual para acercar al título si es necesario */
+}
+
+/* Aplicar el margen interno del data3 para la alineación del texto */
