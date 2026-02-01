@@ -28,7 +28,7 @@ const importStatus = safeGet('importStatus');
 let lastImageData = null;     
 let lastDominantHsl = null;   
 
-// ============ LOGICA DE IMPORTACIÓN DESDE MISIONES ONLINE ============
+// ============ LÓGICA DE IMPORTACIÓN ============
 
 async function importarDesdeMOL() {
     if (!urlMOLInput) return;
@@ -59,7 +59,6 @@ async function importarDesdeMOL() {
         if (titulo && tituloInput) tituloInput.value = titulo.split(' - MisionesOnline')[0].trim();
         if (categoria && rotuloInput) rotuloInput.value = categoria.split(',')[0].trim();
 
-        // Desactivar subtítulo automáticamente al importar
         if (toggleSubtitle) {
             toggleSubtitle.checked = false;
             if (subGroup) subGroup.classList.add('d-none');
@@ -117,17 +116,15 @@ async function applyAll(src) {
         showFitLayers(true);
     }
     applyAccentColor();
-    updateTituloRotuloLive();
 }
 
 function updateTituloRotuloLive(){
     if (rectEl) rectEl.textContent = (rotuloInput.value || '').trim().toUpperCase() || 'RÓTULO';
     if (tituloEl) tituloEl.innerHTML = processTitleForColor(tituloInput.value);      
-    if (toggleSubtitle && toggleSubtitle.checked) {
+    const isSubOn = toggleSubtitle && toggleSubtitle.checked;
+    if (tituloSubEl) {
         tituloSubEl.textContent = (subInput.value || '').trim() || 'Tu subtítulo acá';
-        tituloSubEl.style.display = 'block';
-    } else if (tituloSubEl) {
-        tituloSubEl.style.display = 'none';
+        tituloSubEl.style.display = isSubOn ? 'block' : 'none';
     }
 }
 
@@ -147,33 +144,42 @@ function processTitleForColor(rawText) {
     return parts.join('');
 }
 
-// ============ ARRASTRE HORIZONTAL (COVER) ============
+// ============ ARRASTRE (DRAG) ============
 const coverDrag = { active: false, lastX: 0, offsetX: 50 };
-function setupHorizontalDrag() {
-    box.addEventListener('mousedown', (e) => {
-        if (fitChk.checked) return;
-        coverDrag.active = true;
-        coverDrag.lastX = e.clientX;
-        box.classList.add('dragging');
-        e.preventDefault();
-    });
-    window.addEventListener('mousemove', (e) => {
-        if (!coverDrag.active || fitChk.checked) return;
+box?.addEventListener('mousedown', (e) => {
+    if (fitChk.checked) return;
+    coverDrag.active = true;
+    coverDrag.lastX = e.clientX;
+    box.classList.add('dragging');
+    e.preventDefault();
+});
+
+const fitDrag = { active: false, lastY: 0, offsetTop: 0 };
+fgPhoto?.addEventListener('mousedown', (e) => { 
+    if(!fitChk.checked) return;
+    fitDrag.active = true; fitDrag.lastY = e.clientY; e.preventDefault(); 
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (coverDrag.active && !fitChk.checked) {
         const dx = e.clientX - coverDrag.lastX;
         coverDrag.lastX = e.clientX;
-        const deltaPct = (dx / box.clientWidth) * 100;
-        coverDrag.offsetX = Math.min(100, Math.max(0, coverDrag.offsetX - deltaPct));
-        box.style.backgroundPosition = coverDrag.offsetX + '% center';
-    });
-    window.addEventListener('mouseup', () => {
-        coverDrag.active = false;
-        box.classList.remove('dragging');
-    });
-}
-setupHorizontalDrag();
+        coverDrag.offsetX = Math.min(100, Math.max(0, coverDrag.offsetX - (dx / box.clientWidth) * 100));
+        box.style.backgroundPosition = `${coverDrag.offsetX}% center`;
+    }
+    if (fitDrag.active && fitChk.checked) {
+        const dy = e.clientY - fitDrag.lastY;
+        fitDrag.lastY = e.clientY;
+        fitDrag.offsetTop += dy;
+        applyTop();
+    }
+});
 
-// ============ ARRASTRE VERTICAL (FIT) ============
-const fitDrag = { active: false, lastY: 0, offsetTop: 0 };
+window.addEventListener('mouseup', () => {
+    coverDrag.active = false; fitDrag.active = false;
+    box.classList.remove('dragging');
+});
+
 function applyTop() {
     if (!fitChk.checked || !fgPhoto) return;
     const boxH = box.clientHeight;
@@ -184,21 +190,6 @@ function applyTop() {
     fitDrag.offsetTop = Math.min(maxTop, Math.max(0, fitDrag.offsetTop));
     fgPhoto.style.top = fitDrag.offsetTop + 'px';
 }
-
-fgPhoto?.addEventListener('mousedown', (e) => { 
-    if(!fitChk.checked) return;
-    fitDrag.active = true; 
-    fitDrag.lastY = e.clientY; 
-    e.preventDefault(); 
-});
-window.addEventListener('mousemove', (e) => {
-    if (!fitDrag.active) return;
-    const dy = e.clientY - fitDrag.lastY;
-    fitDrag.lastY = e.clientY;
-    fitDrag.offsetTop += dy;
-    applyTop();
-});
-window.addEventListener('mouseup', () => fitDrag.active = false);
 
 // ============ LISTENERS UI ============
 
@@ -232,6 +223,22 @@ fitChk?.addEventListener('change', () => { if (lastImageData) applyAll(lastImage
 
 // ============ MODOS Y COLORES ============
 
+function applyAccentColor() {
+    let color = customColorInput.value;
+    const isDynamic = toggleDynamicColor.checked;
+    
+    // CORRECCIÓN: Mostrar grupo manual solo si NO es dinámico
+    if (customColorGroup) customColorGroup.classList.toggle('d-none', isDynamic);
+
+    if (isDynamic && lastDominantHsl) {
+        color = `hsl(${Math.round(lastDominantHsl.h*360)}, 80%, 50%)`;
+    }
+    if (box) box.style.setProperty('--accent-color', color);
+}
+
+toggleDynamicColor?.addEventListener('change', applyAccentColor);
+customColorInput?.addEventListener('input', applyAccentColor);
+
 function applyInitialMode() {
     const savedMode = localStorage.getItem('defaultMode') || 'dark';
     if (defaultModeSelect) defaultModeSelect.value = savedMode;
@@ -248,61 +255,7 @@ defaultModeSelect?.addEventListener('change', (e) => {
     applyInitialMode();
 });
 
-function rgbToHsl(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r,g,b), min = Math.min(r,g,b);
-    let h, s, l = (max + min) / 2;
-    if (max === min) h = s = 0;
-    else {
-        const d = max - min;
-        s = l > .5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-    }
-    return { h, s, l };
-}
-
-async function computeDominantColor(src) {
-    const img = new Image();
-    if (isHttpUrl(src)) img.crossOrigin = 'anonymous';
-    img.src = src;
-    await new Promise(res => img.onload = res);
-    const canvas = document.createElement('canvas');
-    const s = 40; canvas.width = s; canvas.height = s;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, s, s);
-    const data = ctx.getImageData(0, 0, s, s).data;
-    let r=0, g=0, b=0, count=0;
-    for (let i=0; i<data.length; i+=4) { if (data[i+3] < 10) continue; r+=data[i]; g+=data[i+1]; b+=data[i+2]; count++; }
-    const hsl = rgbToHsl(r/count, g/count, b/count);
-    lastDominantHsl = hsl;
-    return `linear-gradient(180deg, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100-15}%) 0%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100}%) 60%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100+10}%) 100%)`;
-}
-
-async function setBgFromDominant(src){
-    try { const grad = await computeDominantColor(src); bgBlur.style.background = grad; } 
-    catch(e) { bgBlur.style.background = "#222"; }
-}
-
-function applyAccentColor() {
-    let color = customColorInput.value;
-    if (toggleDynamicColor.checked && lastDominantHsl) {
-        color = `hsl(${Math.round(lastDominantHsl.h*360)}, 80%, 50%)`;
-    }
-    box.style.setProperty('--accent-color', color);
-}
-
-toggleDynamicColor?.addEventListener('change', () => {
-    customColorGroup.classList.toggle('d-none', toggleDynamicColor.checked);
-    applyAccentColor();
-});
-customColorInput?.addEventListener('input', applyAccentColor);
-
-// ============ DESCARGA ============
+// ============ DESCARGA E INICIO ============
 safeGet('downloadButton')?.addEventListener('click', async function () {
     const format = downloadFormatEl.value;
     const mime = downloadFormatEl.options[downloadFormatEl.selectedIndex].dataset.mime;
@@ -317,7 +270,6 @@ safeGet('downloadButton')?.addEventListener('click', async function () {
     } catch (e) { alert('Error al exportar.'); }
 });
 
-// ============ INICIO ============
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const autoUrl = urlParams.get('url');
@@ -339,5 +291,43 @@ function showFitLayers(show) {
     bgBlur.style.display  = show ? 'block' : 'none';
 }
 
+async function setBgFromDominant(src){
+    try {
+        const img = new Image();
+        if (isHttpUrl(src)) img.crossOrigin = 'anonymous';
+        img.src = src;
+        await new Promise(res => img.onload = res);
+        const canvas = document.createElement('canvas');
+        const s = 40; canvas.width = s; canvas.height = s;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, s, s);
+        const data = ctx.getImageData(0, 0, s, s).data;
+        let r=0, g=0, b=0, count=0;
+        for (let i=0; i<data.length; i+=4) { if (data[i+3] < 10) continue; r+=data[i]; g+=data[i+1]; b+=data[i+2]; count++; }
+        const hsl = rgbToHsl(r/count, g/count, b/count);
+        lastDominantHsl = hsl;
+        bgBlur.style.background = `linear-gradient(180deg, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100-15}%) 0%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100}%) 60%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100+10}%) 100%)`;
+    } catch(e) { bgBlur.style.background = "#222"; }
+}
+
+function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) h = s = 0;
+    else {
+        const d = max - min;
+        s = l > .5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return { h, s, l };
+}
+
 applyInitialMode();
 updateTituloRotuloLive();
+applyAccentColor();
