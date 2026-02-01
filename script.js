@@ -74,7 +74,6 @@ async function importarDesdeMOL() {
                 applyAll(dataURL);
             } catch (e) { applyAll(imagenUrl); }
         }
-
         if (importStatus) importStatus.innerText = "✅ Éxito";
     } catch (error) {
         if (importStatus) importStatus.innerText = "❌ Error";
@@ -107,12 +106,14 @@ async function applyAll(src) {
         showFitLayers(false);
         setCoverBackground(src);
         await setBgFromDominant(src); 
-        bgBlur.style.display = 'none';
+        if (bgBlur) bgBlur.style.display = 'none';
     } else {
         clearCoverBackground();
         await setBgFromDominant(src);
-        fgPhoto.src = src;
-        fgPhoto.onload = () => { fitDrag.offsetTop = 0; applyTop(); };
+        if (fgPhoto) {
+            fgPhoto.src = src;
+            fgPhoto.onload = () => { fitDrag.offsetTop = 0; applyTop(); };
+        }
         showFitLayers(true);
     }
     applyAccentColor();
@@ -148,10 +149,8 @@ function processTitleForColor(rawText) {
 const coverDrag = { active: false, lastX: 0, offsetX: 50 };
 box?.addEventListener('mousedown', (e) => {
     if (fitChk.checked) return;
-    coverDrag.active = true;
-    coverDrag.lastX = e.clientX;
-    box.classList.add('dragging');
-    e.preventDefault();
+    coverDrag.active = true; coverDrag.lastX = e.clientX;
+    box.classList.add('dragging'); e.preventDefault();
 });
 
 const fitDrag = { active: false, lastY: 0, offsetTop: 0 };
@@ -177,11 +176,11 @@ window.addEventListener('mousemove', (e) => {
 
 window.addEventListener('mouseup', () => {
     coverDrag.active = false; fitDrag.active = false;
-    box.classList.remove('dragging');
+    if (box) box.classList.remove('dragging');
 });
 
 function applyTop() {
-    if (!fitChk.checked || !fgPhoto) return;
+    if (!fitChk.checked || !fgPhoto || !box) return;
     const boxH = box.clientHeight;
     const imgW = fgPhoto.naturalWidth;
     const imgH = fgPhoto.naturalHeight;
@@ -197,7 +196,7 @@ rotuloInput?.addEventListener('input', updateTituloRotuloLive);
 tituloInput?.addEventListener('input', updateTituloRotuloLive);
 subInput?.addEventListener('input', updateTituloRotuloLive);
 toggleSubtitle?.addEventListener('change', () => {
-    subGroup.classList.toggle('d-none', !toggleSubtitle.checked);
+    if (subGroup) subGroup.classList.toggle('d-none', !toggleSubtitle.checked);
     updateTituloRotuloLive();
 });
 
@@ -208,12 +207,14 @@ function debounce(fn, ms=400){
 safeGet('image_url')?.addEventListener('input', debounce(async (e) => {
     const url = e.target.value.trim();
     if (!url) return;
+    if (safeGet('image_file')) safeGet('image_file').value = '';
     try { const dataURL = await urlToDataURL(url); applyAll(dataURL); } catch (e) { applyAll(url); }
 }, 500));
 
 safeGet('image_file')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (safeGet('image_url')) safeGet('image_url').value = '';
     const reader = new FileReader();
     reader.onload = ev => applyAll(ev.target.result);
     reader.readAsDataURL(file);
@@ -227,8 +228,10 @@ function applyAccentColor() {
     let color = customColorInput.value;
     const isDynamic = toggleDynamicColor.checked;
     
-    // CORRECCIÓN: Mostrar grupo manual solo si NO es dinámico
-    if (customColorGroup) customColorGroup.classList.toggle('d-none', isDynamic);
+    // CORRECCIÓN: Mostrar grupo manual SIEMPRE que NO sea dinámico
+    if (customColorGroup) {
+        customColorGroup.classList.toggle('d-none', isDynamic);
+    }
 
     if (isDynamic && lastDominantHsl) {
         color = `hsl(${Math.round(lastDominantHsl.h*360)}, 80%, 50%)`;
@@ -280,15 +283,16 @@ window.addEventListener('load', () => {
 });
 
 function setCoverBackground(url) {
+    if (!box) return;
     box.style.backgroundImage = `url(${url})`;
     box.style.backgroundSize = 'cover';
     box.style.backgroundPosition = coverDrag.offsetX + '% center';
 }
 
-function clearCoverBackground() { box.style.backgroundImage = 'none'; }
+function clearCoverBackground() { if (box) box.style.backgroundImage = 'none'; }
 function showFitLayers(show) {
-    fgPhoto.style.display = show ? 'block' : 'none';
-    bgBlur.style.display  = show ? 'block' : 'none';
+    if (fgPhoto) fgPhoto.style.display = show ? 'block' : 'none';
+    if (bgBlur) bgBlur.style.display  = show ? 'block' : 'none';
 }
 
 async function setBgFromDominant(src){
@@ -306,8 +310,8 @@ async function setBgFromDominant(src){
         for (let i=0; i<data.length; i+=4) { if (data[i+3] < 10) continue; r+=data[i]; g+=data[i+1]; b+=data[i+2]; count++; }
         const hsl = rgbToHsl(r/count, g/count, b/count);
         lastDominantHsl = hsl;
-        bgBlur.style.background = `linear-gradient(180deg, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100-15}%) 0%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100}%) 60%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100+10}%) 100%)`;
-    } catch(e) { bgBlur.style.background = "#222"; }
+        if (bgBlur) bgBlur.style.background = `linear-gradient(180deg, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100-15}%) 0%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100}%) 60%, hsl(${hsl.h*360},${hsl.s*100}%,${hsl.l*100+10}%) 100%)`;
+    } catch(e) { if (bgBlur) bgBlur.style.background = "#222"; }
 }
 
 function rgbToHsl(r, g, b) {
