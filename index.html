@@ -7,29 +7,50 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.png" />
+    <style>
+        .import-box {
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px dashed #ccc;
+        }
+        .light-mode .import-box { background: rgba(255,255,255,0.1); }
+        #importStatus { min-height: 20px; }
+    </style>
 </head>
 <body>
     <header class="app-header p-3 mb-4">
-                <div class="container">
-                    <h2 class="mb-1">Frankenstein</h2>
-                    <div class="form-group mb-0" style="max-width: 250px; margin-top: 10px;">
-                        <label for="defaultModeSelect" class="small text-white-50">Modo Predeterminado:</label>
-                        <select class="form-control form-control-sm" id="defaultModeSelect">
-                            <option value="dark">Oscuro (Defecto)</option>
-                            <option value="light">Claro</option>
-                        </select>
-                    </div>
-                </div>
-            </header>
+        <div class="container">
+            <h2 class="mb-1">Frankenstein</h2>
+            <div class="form-group mb-0" style="max-width: 250px; margin-top: 10px;">
+                <label for="defaultModeSelect" class="small text-white-50">Modo Predeterminado:</label>
+                <select class="form-control form-control-sm" id="defaultModeSelect">
+                    <option value="dark">Oscuro (Defecto)</option>
+                    <option value="light">Claro</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container mt-5">
         <div class="row">
-            <div class="col-md-5 mb-4"> <form id="imageForm">
-                    
-                    <div class="form-check mt-3 mb-4">
+            <div class="col-md-5 mb-4"> 
+                <form id="imageForm">
+                    <div class="form-check mt-3 mb-3">
                         <input class="form-check-input" type="checkbox" id="toggleDarkMode" checked>
                         <label class="form-check-label" for="toggleDarkMode">Modo Oscuro</label>
+                    </div>
+
+                    <div class="import-box">
+                        <label for="urlMOL" class="small font-weight-bold">Importar desde Misiones Online:</label>
+                        <input type="text" id="urlMOL" class="form-control form-control-sm mb-2" placeholder="Pegar enlace de la noticia...">
+                        <button class="btn btn-primary btn-sm btn-block" type="button" id="btnImportar">Autocompletar Datos</button>
+                        
+                        <div id="importLoader" class="progress mt-2" style="height: 4px; display: none;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <div id="importStatus" class="small mt-1 text-center" style="display:none;"></div>
                     </div>
 
                     <div class="form-group">
@@ -38,12 +59,9 @@
                     </div>
                     <div class="form-group">
                         <label for="titulo">Título</label>
-                        <input type="text" class="form-control" id="titulo" placeholder="Título" required>
+                        <textarea class="form-control" id="titulo" rows="3" placeholder="Título (usa /texto/ para resaltar)" required></textarea>
                     </div>
-                    <div class="form-group d-none" id="subGroup">
-                        <label for="sub">Subtítulo</label>
-                        <input type="text" class="form-control" id="sub" placeholder="Subtítulo">
-                    </div>
+                    
                     <div class="form-group">
                         <label for="image_url">Enlace de la imagen</label>
                         <input type="text" class="form-control" id="image_url" placeholder="Enlace de la imagen">
@@ -56,61 +74,39 @@
                     <div class="form-group mt-4">
                         <label for="downloadFormat">Formato de descarga:</label>
                         <select class="form-control" id="downloadFormat">
-                            <option value="jpg" data-mime="image/jpeg" selected>JPEG (.jpg) - Recomendado</option>
-                            <option value="png" data-mime="image/png">PNG (.png) - Mejor calidad</option>
+                            <option value="jpg" data-mime="image/jpeg" selected>JPEG (.jpg)</option>
+                            <option value="png" data-mime="image/png">PNG (.png)</option>
                             <option value="webp" data-mime="image/webp">WebP (.webp)</option>
                         </select>
                     </div>
 
-                    <button type="button" class="btn btn-success" id="downloadButton">Descargar</button>
-                    <div class="form-check mt-3">
-                    <input class="form-check-input" type="checkbox" id="fitMode">
-                    <label class="form-check-label" for="fitMode">Mostrar imagen completa</label>
-                        </div>
-
-                        <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="toggleSubtitle" checked>
-                        <label class="form-check-label" for="toggleSubtitle">Agregar subtítulo</label>
-                        </div>
-
-                        <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" id="toggleDynamicColor">
-                        <label class="form-check-label" for="toggleDynamicColor">Usar color dinámico</label>
-                        </div>
-
-                        <div class="form-group d-none" id="customColorGroup">
-                        <label for="customColorInput">O color manual:</label>
-                        <input type="color" class="form-control" id="customColorInput" value="#FF7A00">
-                        </div>
-
-                        <div class="form-group d-none" id="subGroup">
-                        <label for="sub">Subtítulo</label>
-                        <input type="text" class="form-control" id="sub" placeholder="Subtítulo">
-                        </div>
-
+                    <button type="button" class="btn btn-success btn-block mb-3" id="downloadButton">Descargar Portada</button>
+                    <hr>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="fitMode"><label class="form-check-label" for="fitMode">Imagen completa (Fit)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="toggleSubtitle" checked><label class="form-check-label" for="toggleSubtitle">Agregar subtítulo</label></div>
+                    <div class="form-group d-none" id="subGroup"><input type="text" class="form-control mt-2" id="sub" placeholder="Escribe el subtítulo..."></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="toggleDynamicColor"><label class="form-check-label" for="toggleDynamicColor">Color dinámico (IA)</label></div>
+                    <div class="form-group d-none" id="customColorGroup"><label class="small">Color manual:</label><input type="color" class="form-control" id="customColorInput" value="#FF7A00"></div>
                 </form>
             </div>
-            <div class="col-md-7"> <div id="imagen3" style="width:1080px;height:1350px;position:relative;">
+            
+            <div class="col-md-7"> 
+                <div id="imagen3" style="width:1080px;height:1350px;position:relative; overflow: hidden; background-color: #000;">
                     <div id="bgBlur" class="bg-blur" aria-hidden="true"></div>
-                    <img id="fgPhoto" alt="" draggable="false" style="display:none;" />
-                    <div class="fondoNegro2">
-                            <div class="margin2"><div id="rectNar2img2">Tu rótulo</div></div>
+                    <img id="fgPhoto" alt="" draggable="false" style="display:none; position: absolute; width: 100%; z-index: 1;" />
+                    <div class="fondoNegro2" style="z-index: 2; position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <div class="margin2"><div id="rectNar2img2">RÓTULO</div></div>
                         <div class="fondoContainer3">
-                            <img src="https://i.ibb.co/gZsmL9bP/gradient.png" class="gradient3">
-                            
+                            <img src="gradient.png" class="gradient3">
                             <div class="data3Margin">
                                 <div class="data3">
                                     <h1 id="titulo3">Tu título acá</h1>
                                     <h3 id="tituloSub" style="display:none;">Tu subtítulo acá</h3>
                                 </div>
                             </div>
-                            
                         </div>
-                        
                     </div>
-                    <div class="footer">
-                        <img src="https://i.ibb.co/LXP90N3D/molbanner.png">
-                    </div>
+                    <div class="footer" style="z-index: 3;"><img src="molbanner.png"></div>
                 </div>
             </div>
         </div>
