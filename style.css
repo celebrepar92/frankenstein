@@ -189,8 +189,8 @@ body {
     font-weight: 900;
     color: var(--label-text-color); /* Color de texto adaptativo */
     padding: 0px;
-    padding-left: 1px;
-    padding-right: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
     margin-bottom: 16px;
     margin-left: 71px;
     background-color: var(--accent-color) !important; /* Color de fondo dinámico */
